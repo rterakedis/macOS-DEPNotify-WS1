@@ -21,13 +21,13 @@ TenantCodeString='Your tenant code here'
 DeviceSerialNumber=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
 # URI for apps
 RequestURIYourAppNumber1="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber1/install"
-RequestURIYourAppNumber2="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber/install"
-RequestURIYourAppNumber3="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber/install"
-RequestURIYourAppNumber4="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber/install"
-RequestURIYourAppNumber5="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber/install"
-RequestURIYourAppNumber6="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber/install"
-RequestURIYourAppNumber7="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber/install"
-RequestURIYourAppNumber8="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber/install"
+RequestURIYourAppNumber2="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber2/install"
+RequestURIYourAppNumber3="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber3/install"
+RequestURIYourAppNumber4="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber4/install"
+RequestURIYourAppNumber5="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber5/install"
+RequestURIYourAppNumber6="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber6/install"
+RequestURIYourAppNumber7="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber7/install"
+RequestURIYourAppNumber8="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber8/install"
 
 # Wait for Setup Assistant to finish
 until [ "$SETUP_ASSISTANT_PROCESS" = "" ]; do
