@@ -1,0 +1,13 @@
+#!/bin/sh
+## postinstall
+
+chmod 644 /Library/LaunchDaemons/com.aag.launchdep.plist
+chown root:wheel /Library/LaunchDaemons/com.aag.launchdep.plist
+
+chmod 755 /var/tmp/depinstall
+chmod +x /var/tmp/depinstall
+
+launchctl load /Library/LaunchDaemons/com.aag.launchdep.plist
+
+exit 0
+exit 1
