@@ -1,0 +1,1 @@
+# macOS-DEPNotify-WS1
