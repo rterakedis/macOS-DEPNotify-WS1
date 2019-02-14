@@ -1,5 +1,17 @@
 #!/bin/bash
 
+###########################################################################
+#POTENTIAL IMPROVEMENTS TO TEST:
+# 1) Change App List to Arrays
+# 2) Employ App Validation by grep'ing ManagedInstallReport.plist -- 
+#    /usr/libexec/PlistBuddy -c Print:InstalledItems /Library/Application\ Support/AirWatch/Data/Munki/Managed\ Installs/ManagedInstallReport.plist | grep "    Firefox"
+# 3) Send API Credentials via Optional Custom XML and read values from managed config
+# 4) Remove Custom XML Profile when values are read (remove profile via API, or forceably)
+# 5) Move "storyline" stuff to Post-Install Scripting in WS1 UEM Internal Apps UI??
+#    If control file exists -- write the lines.
+###########################################################################
+
+
 # Variables
 DEP_NOTIFY_APP="/Applications/Utilities/DEPNotify.app"
 DEP_NOTIFY_CONFIG="/var/tmp/depnotify.log"
@@ -12,11 +24,22 @@ DEP_CLIENT_INSTALL="/Applications/Intelligent Hub.app"
 SETUP_ASSISTANT_PROCESS=$(pgrep -l "Setup Assistant")
 FINDER_PROCESS=$(pgrep -l "Finder")
 
-# The stuff AirWatch needs
+# The stuff Workspace ONE UEM needs
 # AuthHeader uses Svc Acct
-AuthString='Your String Here'
+AUTHSTRING='Your String Here'
 # TenantCode is Unique to MacOS
-TenantCodeString='Your tenant code here'
+TENANTCODESTRING='Your tenant code here'
+
+###########################################################################
+#TESTING SOME NEW CODE:
+# Insert PlistBuddy call to Custom XML Values for AuthHeader/TenantCode
+# AuthHeader uses Svc Acct
+# AUTHSTRING='Your String Here'
+# TenantCode is Unique to MacOS
+# TENANTCODESTRING='Your tenant code here'
+###########################################################################
+
+
 # SerialNumber Of Device
 DeviceSerialNumber=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
 # URI for apps
@@ -28,6 +51,20 @@ RequestURIYourAppNumber5="https://000.awmdm.com/api/mam/apps/internal/YourAppNum
 RequestURIYourAppNumber6="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber6/install"
 RequestURIYourAppNumber7="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber7/install"
 RequestURIYourAppNumber8="https://000.awmdm.com/api/mam/apps/internal/YourAppNumber8/install"
+
+
+###########################################################################
+#TESTING SOME NEW CODE:
+MANAGED_INSTALL_REPORT_PLIST="/Library/Application\ Support/AirWatch/Data/Munki/Managed\ Installs/ManagedInstallReport.plist"
+APP_INSTALL_REQUEST_URI="https://aw400.awmdm.com/api/mam/apps/internal/"
+APP_INSTALL_REQUEST_API_COMMAND="install"
+declare -a BOOTSTRAP_APP_IDS
+declare -a BOOTSTRAP_APP_VALIDATION
+BOOTSTRAP_APP_IDS=(1,2,3)
+BOOTSTRAP_APP_VALIDATION=("FireFox","Google Chrome","Microsoft Office")
+###########################################################################
+
+
 
 # Wait for Setup Assistant to finish
 until [ "$SETUP_ASSISTANT_PROCESS" = "" ]; do
@@ -128,13 +165,13 @@ sleep 20
 
 # Install Apps
 echo "Status: We found some apps!" >> $DEP_NOTIFY_CONFIG
-curl --header 'Authorization:'"$AuthString"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber
+curl --header 'Authorization:'"$AUTHSTRING"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber
 sleep 30
 echo "Command: MainText: The company that we grew out of to become Alaska Airlines was born in 1932 when Linious 'Mac' McGee painted 'McGee Airways' on the side of a three-passenger Stinson and started flying out of Anchorage. Mine owner Wesley 'Earl' Dunkle loaned money to pilots Steve Mills, Charlie Ruttan, and Jack Waterworth to start Star Air Service. In 1934, McGee merged with Star Air Service, creating the largest airline in Alaska with 22 aircraft. Flying in those days wasn't scheduled. Flights typically took off once the plane was full, whether it was full of passengers, furs, or groceries." >> $DEP_NOTIFY_CONFIG
 echo "Command: Image: /var/tmp/icons/aag2.jpg" >> $DEP_NOTIFY_CONFIG
-curl --header 'Authorization:'"$AuthString"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber4
+curl --header 'Authorization:'"$AUTHSTRING"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber4
 sleep 45
-curl --header 'Authorization:'"$AuthString"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber3
+curl --header 'Authorization:'"$AUTHSTRING"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber3
 sleep 45
 echo "Command: MainText: After those two airlines merged along with other mergers, where many more carriers were woven into the fabric of the company, the Star Air Service name was changed a couple of times—until 1944, when they found one that stuck: Alaska Airlines, the name we use today." >> $DEP_NOTIFY_CONFIG
 echo "Command: Image: /var/tmp/icons/aag4.jpg" >> $DEP_NOTIFY_CONFIG
@@ -143,7 +180,7 @@ echo "Status: We are installing a few applications now" >> $DEP_NOTIFY_CONFIG
 echo "Command: MainText: By the late 1940s, using surplus military aircraft, Alaska Airlines had branched into worldwide charter work, including the Berlin Airlift in 1948 and Operation Magic Carpet, the airlift of thousands of Yemenite Jews to Israel in 1949." >> $DEP_NOTIFY_CONFIG
 echo "Command: Image: /var/tmp/icons/aag4b.png" >> $DEP_NOTIFY_CONFIG
 sleep 45
-curl --header 'Authorization:'"$AuthString"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber5
+curl --header 'Authorization:'"$AUTHSTRING"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber5
 echo "Command: MainText: Charlie Willis, a decorated World War II pilot came aboard as chairman and CEO in '57. A born marketer, he ushered in one of the most colorful eras of our company’s history, and brought in-flight movies to the nation's skies for the first time." >> $DEP_NOTIFY_CONFIG
 echo "Command: Image: /var/tmp/icons/aag5.png" >> $DEP_NOTIFY_CONFIG
 sleep 45
@@ -156,7 +193,7 @@ sleep 45
 echo "Command: MainText: The Eskimo first appeared in 1972, when Alaska adopted a four-logo paint scheme – a totem pole, to represent the native culture of Southeast Alaska; a gold miner, to represent the booming gold rush days in Alaska; Russian spires, to represent early Russian heritage in the state of Alaska; and a native Alaskan adorned in a traditional qulittaq (parka with ruff) to represent the Arctic region and its people. Indigenous Alaskans in the Arctic, traditionally of Inupiat or Yupik descent, commonly refer to themselves as Eskimo." >> $DEP_NOTIFY_CONFIG
 echo "Command: Image: /var/tmp/icons/aag3.jpg" >> $DEP_NOTIFY_CONFIG
 sleep 45
-curl --header 'Authorization:'"$AuthString"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber6
+curl --header 'Authorization:'"$AUTHSTRING"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber6
 echo "Status: A handy phone number to remember is 1-877-238-1077 for the ITS Help Desk" >> $DEP_NOTIFY_CONFIG
 echo "Command: MainText: These four liveries adorned Alaska’s jets from 1972 until 1976, when the company adopted the Eskimo tail fleet-wide, and updated the face to be less stern." >> $DEP_NOTIFY_CONFIG
 echo "Command: Image: /var/tmp/icons/aag7c.png" >> $DEP_NOTIFY_CONFIG
@@ -164,7 +201,7 @@ sleep 45
 echo "Command: MainText: In '73 the company turned a profit and, for the first time in years, there appeared to be prospects for long-term stability. Bruce Kennedy, an integral part of Ron Cosgrave’s team, became CEO in '79, the same year US skies were deregulated. Alaska was one of only three carriers that pushed for deregulation, knowing significant growth would be impossible without it. At the time, our airline served 10 cities in Alaska and one in the lower 48 (Seattle)." >> $DEP_NOTIFY_CONFIG
 echo "Command: Image: /var/tmp/icons/aag7b.png" >> $DEP_NOTIFY_CONFIG
 sleep 45
-curl --header 'Authorization:'"$AuthString"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber7
+curl --header 'Authorization:'"$AUTHSTRING"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber7
 echo "Command: MainText: We expanded in a measured, constant fashion throughout the 1980s. Following start of service to Portland and San Francisco in 1979, expansion over the next five years brought Alaska to Southern California, Oakland, San Jose, Spokane, Boise, Phoenix, and Tucson, and saw resumption of service to Nome and Kotzebue." >> $DEP_NOTIFY_CONFIG
 echo "Command: Image: /var/tmp/icons/aag8.png" >> $DEP_NOTIFY_CONFIG
 sleep 45
@@ -184,7 +221,7 @@ sleep 45
 echo "Command: Image: /var/tmp/icons/aa.jpg" >> $DEP_NOTIFY_CONFIG
 echo "Command: MainText: Whenever the history of commercial aviation is written, people will ask how an obscure little airline in America's hinterland continued to survive and thrive while once-proud giants disappeared. Grit and determination will be part of the answer. However, more than that, it's our people. Their caring, resourcefulness, integrity, professionalism, and spirit. The unique spirit of The Great Land where our airline was born." >> $DEP_NOTIFY_CONFIG
 echo "Status: Installing Office before we check for system updates" >> $DEP_NOTIFY_CONFIG
-curl --header 'Authorization:'"$AuthString"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber2
+curl --header 'Authorization:'"$AUTHSTRING"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber2
 sleep 60
 echo "Status: Office is almost 2GB so it's gonna be a few..." >> $DEP_NOTIFY_CONFIG
 
@@ -213,7 +250,7 @@ echo "Status: Checking for and installing any macOS updates" >> $DEP_NOTIFY_CONF
 sleep 20
 
 # Install AV
-curl --header 'Authorization:'"$AuthString"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber8
+curl --header 'Authorization:'"$AUTHSTRING"'' --header 'aw-tenant-code:'"$TenantCodeString"'' --header "Content-Type: application/json" --header "Accept: application/json;version=1" --data '{"SerialNumber":"'"$DeviceSerialNumber"'"}' --url $RequestURIYourAppNumber8
 
 # Encrypt
 echo "Command: MainTitle: Wrapping things up" >> $DEP_NOTIFY_CONFIG

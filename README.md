@@ -20,21 +20,21 @@ Near line 47: `**case "-airwatch" :
 
 Now, look for `OtherLogs.munki` and add a section for `OtherLogs.airwatch`
 I copied the MUNKI settings:
-`case OtherLogs.airwatch :
-                    if (line.contains("Installing") || line.contains("Downloading") || line.contains("Install of"))
-                        && !line.contains(" at ") && !line.contains(" from ") {
-
-                        do {
-                            let installerRegEx = try NSRegularExpression(pattern: "^.{0,27}")
-                            let status = installerRegEx.stringByReplacingMatches(in: line,
-                                                                                 options: NSRegularExpression.MatchingOptions.anchored,
-                                                                                 range: NSMakeRange(0, line.count),
-                                                                                 withTemplate: "").trimmingCharacters(in: .whitespacesAndNewlines)
-                            statusText = status
-                        } catch {
-                            NSLog("Couldn't parse ManagedSoftwareUpdate.log")
-                        }
-                    }`
+```swift
+case OtherLogs.airwatch :
+    if (line.contains("Installing") || line.contains("Downloading") || line.contains("Install of")) && !line.contains(" at ") && !line.contains(" from ") {
+        do {
+            let installerRegEx = try NSRegularExpression(pattern: "^.{0,27}")
+            let status = installerRegEx.stringByReplacingMatches(in: line,
+            options: NSRegularExpression.MatchingOptions.anchored,
+            range: NSMakeRange(0, line.count),
+            withTemplate: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            statusText = status
+        } catch {
+            NSLog("Couldn't parse ManagedSoftwareUpdate.log")
+        }
+    }
+```
 
 
 # The PLIST file used to launch DEPNotify
